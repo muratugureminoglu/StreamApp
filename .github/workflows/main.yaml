@@ -27,12 +27,11 @@ jobs:
         node-version: '16.20.2'
         cache: 'npm'
 
-    - name: Decrypt code signing key
+        
+    - name: Import GPG key
       run: |
-        echo "${{ secrets.CODESIGNING_ASC_ENC }}" | base64 -d > codesigning.asc.enc
-        openssl aes-256-cbc -K ${{ secrets.CODESIGNING_KEY }} -iv ${{ secrets.CODESIGNING_IV }} -in codesigning.asc.enc -out codesigning.asc -d
-        export GPG_TTY=$(tty)
-        gpg2 --batch --fast-import codesigning.asc
+        echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --yes --import
+        gpg --list-keys
       
     - name: Clone and build parent project
       run: |
@@ -84,12 +83,14 @@ jobs:
         fi
       env:
         # Add your Maven credentials as secrets
-        MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-        MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+          CI_DEPLOY_USERNAME: ${{ secrets.CI_DEPLOY_USERNAME }}
+          CI_DEPLOY_PASSWORD: ${{ secrets.CI_DEPLOY_PASSWORD }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         
     - name: Deploy Release
       if: startsWith(github.ref, 'refs/tags/ams-v')
       run: mvn deploy -DskipTests --quiet --settings mvn-settings.xml
       env:
-        MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-        MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+          CI_DEPLOY_USERNAME: ${{ secrets.CI_DEPLOY_USERNAME }}
+          CI_DEPLOY_PASSWORD: ${{ secrets.CI_DEPLOY_PASSWORD }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
