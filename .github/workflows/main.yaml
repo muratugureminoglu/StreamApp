@@ -63,6 +63,8 @@ jobs:
         
     - name: Install and compile npm packages
       run: |
+        pwd
+        ls -alh
         npm install
         npm run compile
         cd embedded-player
