@@ -41,8 +41,8 @@ jobs:
       - name: Build Web-Player first time
         working-directory: Web-Player
         run: |
-          npm install
-          npm run build
+          npm install --include=dev
+          npm run compile
 
       - name: Copy StreamApp/dist to Web-Player
         run: |
