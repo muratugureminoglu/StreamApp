@@ -1,0 +1,58 @@
+name: Build StreamApp with Web-Player
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout StreamApp
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Build StreamApp
+        run: |
+          npm install
+          npm run build
+
+      - name: Get current branch name
+        id: get_branch
+        run: echo "branch_name=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+
+      - name: Clone Web-Player
+        run: |
+          git clone --depth 1 --branch "${{ steps.get_branch.outputs.branch_name }}" https://github.com/ant-media/Web-Player.git || \
+          git clone --depth 1 https://github.com/ant-media/Web-Player.git
+          
+      - name: Build Web-Player first time
+        working-directory: Web-Player
+        run: |
+          npm install
+          npm run build
+
+      - name: Copy StreamApp/dist to Web-Player
+        run: |
+          rm -rf Web-Player/node_modules/@antmedia/webrtc_adaptor
+          mkdir -p Web-Player/node_modules/@antmedia/webrtc_adaptor
+          cp -r dist/* Web-Player/node_modules/@antmedia/webrtc_adaptor/
+
+      - name: Rebuild Web-Player after copy
+        working-directory: Web-Player
+        run: |
+          npm run build
+
+      - name: Copy Web-Player/dist to StreamApp
+        run: |
+          rm -rf embedded-player/node_modules/@antmedia/web_player
+          mkdir -p embedded-player/node_modules/@antmedia/web_player
+          cp -r Web-Player/dist/* embedded-player/node_modules/@antmedia/web_player/
