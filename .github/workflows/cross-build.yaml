@@ -61,3 +61,8 @@ jobs:
           rm -rf embedded-player/node_modules/@antmedia/web_player
           mkdir -p embedded-player/node_modules/@antmedia/web_player
           cp -r Web-Player/dist/* embedded-player/node_modules/@antmedia/web_player/
+
+      - name: Build final StreamApp (after embedded copy)
+        run: |
+          npm install
+          npm run compile
