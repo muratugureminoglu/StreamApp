@@ -53,7 +53,8 @@ jobs:
       - name: Rebuild Web-Player after copy
         working-directory: Web-Player
         run: |
-          npm run build
+          npm install --include=dev
+          npm run compile
 
       - name: Copy Web-Player/dist to StreamApp
         run: |
