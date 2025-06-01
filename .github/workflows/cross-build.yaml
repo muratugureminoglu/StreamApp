@@ -23,7 +23,11 @@ jobs:
       - name: Build StreamApp
         run: |
           npm install
-          npm run build
+          npm run compile
+          cd embedded-player
+          npm install
+          npm run compile
+          npm run deploy
 
       - name: Get current branch name
         id: get_branch
