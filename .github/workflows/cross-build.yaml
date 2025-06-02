@@ -35,7 +35,7 @@ jobs:
 
       - name: Clone Web-Player
         run: |
-          git clone --depth 1 --branch "${{ steps.get_branch.outputs.branch_name }}" https://github.com/ant-media/Web-Player.git || \
+          git clone --depth 1 -b ${{ github.ref_name }} https://github.com/ant-media/Web-Player.git || \
           git clone --depth 1 https://github.com/ant-media/Web-Player.git
           
       - name: Build Web-Player first time
